@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,4 +21,7 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+    Route::prefix('laporan')->name('laporan.')->controller(LaporanController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+    });
 });
