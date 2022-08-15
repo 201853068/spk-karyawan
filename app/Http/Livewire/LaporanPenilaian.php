@@ -55,10 +55,10 @@ class LaporanPenilaian extends Component
             $rows = $rows->map(function ($item) use ($kriteria, $max, $min) {
                 if ($item['k' . $kriteria->id] > 0) {
                     if ($kriteria->tipe == 'BENEFIT' && $max > 0) {
-                        $item['k' . $kriteria->id] = number_format($item['k' . $kriteria->id] / $max, 2);
+                        $item['k' . $kriteria->id] = round($item['k' . $kriteria->id] / $max, 2);
                     }
                     if ($kriteria->tipe == 'COST' && $min > 0) {
-                        $item['k' . $kriteria->id] = number_format($min / $item['k' . $kriteria->id], 2);
+                        $item['k' . $kriteria->id] = round($min / $item['k' . $kriteria->id], 2);
                     }
                 }
                 return $item;
@@ -68,19 +68,19 @@ class LaporanPenilaian extends Component
 
         foreach ($semua_kriteria as $kriteria) {
             $rows = $rows->map(function ($item) use ($kriteria) {
-                $item['k' . $kriteria->id] = number_format($item['k' . $kriteria->id] * $kriteria->bobot, 2);
+                $item['k' . $kriteria->id] = round($item['k' . $kriteria->id] * $kriteria->bobot, 2);
                 return $item;
             });
         }
         $rows = $rows->map(function ($item) {
-            $item['rangking'] = number_format(collect($item)->skip(3)->sum(), 2);
+            $item['rangking'] = round(collect($item)->skip(3)->sum(), 2);
             return $item;
         });
         $this->rangking = $rows->map('array_values');
 
         $rows = $rows->map(function ($item, $index) use ($semua_karyawan) {
             $item = collect($item)->only(['id', 'nama', 'jabatan', 'rangking']);
-            $item->push($semua_karyawan[$index]->terpilih ? 'Terpilih' : 'Belum Terpilih');
+            $item['status'] = $semua_karyawan[$index]->terpilih ? 'Terpilih' : 'Belum Terpilih';
             return $item->toArray();
         });
         $this->pemilihan = $rows->map('array_values');

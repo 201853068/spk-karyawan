@@ -29,25 +29,27 @@
         window.grid({
             id: 'rangking',
             columns: [...@js($this->columns), 'Rangking'],
-            data: @js($this->rangking),
+            data: @js($this->rangking).sort((a, b) => b[9] - a[9]),
         });
         window.grid({
             id: 'pemilihan',
             columns: [...@js($this->columns).slice(0, 3), 'Rangking', 'Status'],
-            data: @js($this->pemilihan),
-            action: (row) => {
-                const id = row[0];
-                const terpilih = row[4] === 'Terpilih';
-                const className = terpilih ? 'btn btn-danger' : 'btn btn-primary';
-                const label = terpilih ? 'Batalkan' : 'Pilih';
-                return {
-                    name: 'Aksi',
-                    type: 'button',
-                    className,
-                    label,
-                    onClick: () => Livewire.emit('karyawan_terpilih', id),
-                };
-            },
+            data: @js($this->pemilihan).sort((a, b) => b[3] - a[3]),
+            action: {
+                name: 'Aksi',
+                builder: (row) => {
+                    const id = row[0];
+                    const terpilih = row[4] === 'Terpilih';
+                    const className = terpilih ? 'btn btn-danger' : 'btn btn-primary';
+                    const label = terpilih ? 'Batalkan' : 'Pilih';
+                    return {
+                        type: 'button',
+                        className,
+                        label,
+                        onClick: () => Livewire.emit('karyawan_terpilih', id),
+                    };
+                },
+            }
         });
     });
 </script>

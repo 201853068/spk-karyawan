@@ -6,7 +6,7 @@ window.grid = ({ id, columns, data, action }) => {
         columns: action ? [...columns, {
             name: action.name,
             formatter: (cell, row) => {
-                const props = action(row.cells.map(cell => cell.data));
+                const props = action.builder(row.cells.map(cell => cell.data));
                 return h(props.type, {
                     className: props.className,
                     onClick: props.onClick,
