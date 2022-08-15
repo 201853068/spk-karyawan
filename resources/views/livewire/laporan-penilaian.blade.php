@@ -5,33 +5,50 @@
     <div id="normalisasi"></div>
     <h4 class="text-center">Perangkingan</h4>
     <div id="rangking"></div>
+    <h4 class="text-center">Penentuan Karyawan</h4>
+    <div id="pemilihan"></div>
 </div>
 
-@once
 @section('head')
-<link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+@vite('resources/js/laporan-penilaian.js')
 @stop
-@endonce
 
-@once
-@section('javascript')
-<script type="module">
-    import { Grid } from "https://unpkg.com/gridjs?module";
-
-    new Grid({
-        columns: @js($this->columns),
-        data: @js($this->analisa),
-    }).render(document.getElementById("analisa"));
-
-    new Grid({
-        columns: @js($this->columns),
-        data: @js($this->normalisasi),
-    }).render(document.getElementById("normalisasi"));
-
-    new Grid({
-        columns: [...@js($this->columns), 'Rangking'],
-        data: @js($this->rangking),
-    }).render(document.getElementById("rangking"));
+@push('javascript')
+<script>
+    document.addEventListener('livewire:load', function () {
+        window.grid({
+            id: 'analisa',
+            columns: @js($this->columns),
+            data: @js($this->analisa),
+        });
+        window.grid({
+            id: 'normalisasi',
+            columns: @js($this->columns),
+            data: @js($this->normalisasi),
+        });
+        window.grid({
+            id: 'rangking',
+            columns: [...@js($this->columns), 'Rangking'],
+            data: @js($this->rangking),
+        });
+        window.grid({
+            id: 'pemilihan',
+            columns: [...@js($this->columns).slice(0, 3), 'Rangking', 'Status'],
+            data: @js($this->pemilihan),
+            action: (row) => {
+                const id = row[0];
+                const terpilih = row[4] === 'Terpilih';
+                const className = terpilih ? 'btn btn-danger' : 'btn btn-primary';
+                const label = terpilih ? 'Batalkan' : 'Pilih';
+                return {
+                    name: 'Aksi',
+                    type: 'button',
+                    className,
+                    label,
+                    onClick: () => Livewire.emit('karyawan_terpilih', id),
+                };
+            },
+        });
+    });
 </script>
-@stop
-@endonce
+@endpush

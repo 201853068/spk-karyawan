@@ -18,4 +18,8 @@ class Karyawan extends Model
     {
         return $this->hasMany('App\Models\Penilaian', 'karyawan_id');
     }
+
+    protected $casts = [
+        'terpilih' => 'boolean',
+    ];
 }

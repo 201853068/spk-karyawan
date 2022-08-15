@@ -15,14 +15,8 @@ class Penilaian extends Model
         return $this->belongsTo('App\Models\Tugas', 'tugas_id');
     }
 
-    protected $cast = [
+    protected $casts = [
         'nilai' => 'integer'
     ];
 
-    // protected static function booted()
-    // {
-    //     static::saved(function ($penilaian) {
-    //         PenilaianProcessed::dispatch();
-    //     });
-    // }
 }
