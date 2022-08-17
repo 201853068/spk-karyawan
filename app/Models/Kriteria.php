@@ -13,4 +13,9 @@ class Kriteria extends Model
     {
         return $this->nama . ' (' . $this->bobot . '%)';
     }
+
+    public function scopeTugas($query)
+    {
+        return $query->where('input', 'TUGAS');
+    }
 }

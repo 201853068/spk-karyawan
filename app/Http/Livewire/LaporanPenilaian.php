@@ -39,9 +39,24 @@ class LaporanPenilaian extends Component
                 'jabatan' => $karyawan->jabatan->nama,
             ];
             foreach ($semua_kriteria as $kriteria) {
-                $row['k' . $kriteria->id] = (int)$karyawan->penilaian()->whereHas('tugas', function (Builder $query) use ($kriteria) {
-                    $query->where('kriteria_id', $kriteria->id);
-                })->sum('nilai');
+                $nilai = 0;
+                switch ($kriteria->input) {
+                    case 'USIA':
+                        $nilai = $karyawan->usia;
+                        break;
+                    case 'PENDIDIKAN':
+                        $nilai_pendidikan = ['SMP' => 1, 'SMA' => 2, 'SARJANA' => 3];
+                        $nilai = $nilai_pendidikan[$karyawan->pendidikan];
+                        break;
+                    case 'TUGAS':
+                        $nilai = (int)$karyawan->penilaian()->whereHas('tugas', function (Builder $query) use ($kriteria) {
+                            $query->where('kriteria_id', $kriteria->id);
+                        })->sum('nilai');
+                        break;
+                    default:
+                        break;
+                }
+                $row['k' . $kriteria->id] = $nilai;
             }
             $rows->push($row);
         }
