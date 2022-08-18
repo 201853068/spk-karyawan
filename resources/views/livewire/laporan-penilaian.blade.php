@@ -35,6 +35,7 @@
             id: 'pemilihan',
             columns: [...@js($this->columns).slice(0, 3), 'Rangking', 'Status'],
             data: @js($this->pemilihan).sort((a, b) => b[3] - a[3]),
+            @if($this->is_owner)
             action: {
                 name: 'Aksi',
                 builder: (row) => {
@@ -50,6 +51,7 @@
                     };
                 },
             }
+            @endif
         });
     });
 </script>
