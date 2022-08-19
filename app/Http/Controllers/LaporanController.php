@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Karyawan;
+use App\Models\Kriteria;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
@@ -13,7 +15,11 @@ class LaporanController extends Controller
      */
     public function index()
     {
-        return view('laporan.index');
+        $kriteria = Kriteria::all();
+        $karyawan = Karyawan::with('jabatan')->get();
+        $periode = $karyawan->pluck('periode')->unique()->sortDesc();
+
+        return view('laporan.index', compact(['kriteria', 'karyawan', 'periode']));
     }
 
     /**

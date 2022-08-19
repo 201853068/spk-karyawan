@@ -16,7 +16,8 @@ class Penilaian extends Model
     }
 
     protected $casts = [
-        'nilai' => 'integer'
+        'nilai' => 'integer',
+        'tanggal' => 'date',
     ];
 
 }

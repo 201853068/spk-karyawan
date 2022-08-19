@@ -1,4 +1,4 @@
-<div>
+<div wire:init="init">
     <h4 class="text-center">Analisa</h4>
     <div id="analisa"></div>
     <h4 class="text-center">Normalisasi</h4>
@@ -16,25 +16,30 @@
 @push('javascript')
 <script>
     document.addEventListener('livewire:load', function () {
-        window.grid({
+        window.analisa = window.grid({
             id: 'analisa',
             columns: @js($this->columns),
-            data: @js($this->analisa),
         });
-        window.grid({
+        window.addEventListener('analisa-updated', event => {
+            window.analisa.updateConfig({data: event.detail}).forceRender();
+        })
+        window.normalisasi = window.grid({
             id: 'normalisasi',
             columns: @js($this->columns),
-            data: @js($this->normalisasi),
         });
-        window.grid({
+        window.addEventListener('normalisasi-updated', event => {
+            window.normalisasi.updateConfig({data: event.detail}).forceRender();
+        })
+        window.rangking = window.grid({
             id: 'rangking',
             columns: [...@js($this->columns), 'Rangking'],
-            data: @js($this->rangking).sort((a, b) => b[9] - a[9]),
         });
-        window.grid({
+        window.addEventListener('rangking-updated', event => {
+            window.rangking.updateConfig({data: event.detail.sort((a, b) => b[9] - a[9])}).forceRender();
+        })
+        window.pemilihan = window.grid({
             id: 'pemilihan',
             columns: [...@js($this->columns).slice(0, 3), 'Rangking', 'Status'],
-            data: @js($this->pemilihan).sort((a, b) => b[3] - a[3]),
             @if($this->is_owner)
             action: {
                 name: 'Aksi',
@@ -53,6 +58,9 @@
             }
             @endif
         });
+        window.addEventListener('pemilihan-updated', event => {
+            window.pemilihan.updateConfig({data: event.detail.sort((a, b) => b[3] - a[3])}).forceRender();
+        })
     });
 </script>
 @endpush

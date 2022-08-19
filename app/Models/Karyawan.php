@@ -21,5 +21,6 @@ class Karyawan extends Model
 
     protected $casts = [
         'terpilih' => 'boolean',
+        'periode' => 'date',
     ];
 }

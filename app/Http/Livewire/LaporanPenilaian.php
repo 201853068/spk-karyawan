@@ -3,42 +3,50 @@
 namespace App\Http\Livewire;
 
 use App\Models\Karyawan;
-use App\Models\Kriteria;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class LaporanPenilaian extends Component
 {
     public $is_owner;
+    public $semua_kriteria;
+    public $semua_karyawan;
+    public $semua_periode;
+    public $periode;
     public $columns;
-    public $analisa;
-    public $normalisasi;
-    public $rangking;
-    public $pemilihan;
 
-    protected $listeners = ['karyawan_terpilih' => 'penetapan_karyawan'];
+    protected $listeners = ['karyawan_terpilih' => 'penetapan_karyawan', 'periode_terpilih' => 'ubah_periode'];
 
-    public function mount()
+    public function mount($semua_kriteria, $semua_karyawan, $semua_periode)
     {
         $this->is_owner = Auth::user()->role_id == 4;
-        $semua_karyawan = Karyawan::with('jabatan')->get();
-        $semua_kriteria = Kriteria::all();
+        $this->semua_kriteria = $semua_kriteria;
+        $this->semua_karyawan = $semua_karyawan;
+        $this->semua_periode = $semua_periode;
+        $this->periode = $this->semua_periode->first();
 
         $this->columns = $semua_kriteria
             ->pluck('nama')
             ->prepend('Jabatan')
             ->prepend('Nama')
             ->prepend('ID');
+    }
 
+    public function init()
+    {
         $rows = collect([]);
+        $semua_karyawan = $this->semua_karyawan->filter(function ($item) {
+            return $item->periode == Carbon::parse($this->periode);
+        });
         foreach ($semua_karyawan as $karyawan) {
             $row = [
                 'id' => $karyawan->id,
                 'nama' => $karyawan->nama,
                 'jabatan' => $karyawan->jabatan->nama,
             ];
-            foreach ($semua_kriteria as $kriteria) {
+            foreach ($this->semua_kriteria as $kriteria) {
                 $nilai = 0;
                 switch ($kriteria->input) {
                     case 'USIA':
@@ -60,9 +68,10 @@ class LaporanPenilaian extends Component
             }
             $rows->push($row);
         }
-        $this->analisa = $rows->map('array_values');
+        $this->dispatchBrowserEvent('analisa-updated', $rows->map('array_values'));
 
-        foreach ($semua_kriteria as $kriteria) {
+        if($rows->isEmpty()) return;
+        foreach ($this->semua_kriteria as $kriteria) {
             $semua_nilai = $rows->pluck('k' . $kriteria->id)->toArray();
             $max = max($semua_nilai);
             $min = min($semua_nilai);
@@ -79,9 +88,10 @@ class LaporanPenilaian extends Component
                 return $item;
             });
         }
-        $this->normalisasi = $rows->map('array_values');
+        $this->dispatchBrowserEvent('normalisasi-updated', $rows->map('array_values'));
 
-        foreach ($semua_kriteria as $kriteria) {
+        if($rows->isEmpty()) return;
+        foreach ($this->semua_kriteria as $kriteria) {
             $rows = $rows->map(function ($item) use ($kriteria) {
                 $item['k' . $kriteria->id] = round($item['k' . $kriteria->id] * $kriteria->bobot, 2);
                 return $item;
@@ -91,14 +101,21 @@ class LaporanPenilaian extends Component
             $item['rangking'] = round(collect($item)->skip(3)->sum(), 2);
             return $item;
         });
-        $this->rangking = $rows->map('array_values');
+        $this->dispatchBrowserEvent('rangking-updated', $rows->map('array_values'));
 
-        $rows = $rows->map(function ($item, $index) use ($semua_karyawan) {
+        if($rows->isEmpty()) return;
+        $rows = $rows->map(function ($item) use ($semua_karyawan) {
             $item = collect($item)->only(['id', 'nama', 'jabatan', 'rangking']);
-            $item['status'] = $semua_karyawan[$index]->terpilih ? 'Terpilih' : 'Belum Terpilih';
+            $item['status'] = $semua_karyawan->find($item['id'])->terpilih ? 'Terpilih' : 'Belum Terpilih';
             return $item->toArray();
         });
-        $this->pemilihan = $rows->map('array_values');
+        $this->dispatchBrowserEvent('pemilihan-updated', $rows->map('array_values'));
+    }
+
+    public function ubah_periode($periode)
+    {
+        $this->periode = $periode;
+        $this->init();
     }
 
     public function penetapan_karyawan($id)

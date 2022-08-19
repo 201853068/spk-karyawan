@@ -2,9 +2,12 @@
 
 @section('page_header')
 <div class="container-fluid">
-    <h1 class="page-title">
-        <i class="voyager-documentation"></i> Laporan
-    </h1>
+    <div style="display: flex; align-items: baseline;">
+        <h1 class="page-title">
+            <i class="voyager-documentation"></i> Laporan
+        </h1>
+        @livewire('periode-laporan', ['periode' => $periode])
+    </div>
 </div>
 @stop
 
@@ -15,7 +18,7 @@
         <div class="col-md-12">
             <div class="panel panel-bordered">
                 <div class="panel-body">
-                    <livewire:laporan-penilaian />
+                    @livewire('laporan-penilaian', ['semua_kriteria' => $kriteria, 'semua_karyawan' => $karyawan, 'semua_periode' => $periode])
                 </div>
             </div>
         </div>
