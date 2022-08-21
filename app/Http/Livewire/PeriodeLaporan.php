@@ -18,7 +18,9 @@ class PeriodeLaporan extends Component
                 'label' => $item->locale('id_ID')->isoFormat('D MMMM Y'),
             ];
         });
-        $this->selected = $this->options->first()['value'];
+        if($this->options->isNotEmpty()) {
+            $this->selected = $this->options->first()['value'];
+        }
     }
 
     public function render()
