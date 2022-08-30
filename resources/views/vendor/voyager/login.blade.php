@@ -27,14 +27,9 @@
 
                 <div class="overflow-hidden bg-white shadow-xl mt-7 rounded-xl">
                     <div class="flex items-center justify-start h-24 px-8 space-x-5 font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600">
-                        <?php $admin_logo_img = Voyager::setting('admin.icon_image', ''); ?>
-                        @if($admin_logo_img == '')
-                            <img class="w-10 h-auto" src="{{ voyager_asset('images/logo-icon-light.png') }}" alt="Logo Icon">
-                        @else
-                            <img class="w-10 h-auto" src="{{ Voyager::image($admin_logo_img) }}" alt="Logo Icon">
-                        @endif
+                        <img class="w-10 h-auto" src="{{ config('app.brand_logo') }}" alt="Logo Icon">
                         <div class="flex flex-col justify-center w-auto h-full">
-                            <p style="text-transform: uppercase;">{{ Voyager::setting('admin.title') }}</p>
+                            <p style="text-transform: uppercase;">{{ config('app.brand_title') }}</p>
                             <p class="text-xs font-normal">Silahkan login untuk melanjutkan</p>
                         </div>
                     </div>

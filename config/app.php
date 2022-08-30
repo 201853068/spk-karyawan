@@ -4,6 +4,14 @@ use Illuminate\Support\Facades\Facade;
 
 return [
 
+    'brand_logo' => '/logo.png',
+
+    'brand_title' => 'Avika Moslem Clothes',
+
+    'top_sidebar_color' => '#2563eb',
+
+    'sidebar_color' => '#353d47',
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
