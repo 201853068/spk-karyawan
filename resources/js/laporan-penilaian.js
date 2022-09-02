@@ -7,7 +7,6 @@ window.grid = ({ id, columns, data, action, styles }) => {
         attributes: (cell) => {
             return {
                 'data-cell-content': cell,
-                'onclick': () => alert(cell),
                 'style': styles ? styles[cell] : '',
             }
         }

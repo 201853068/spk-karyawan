@@ -51,7 +51,9 @@ class LaporanPenilaian extends Component
                 $nilai = 0;
                 switch ($kriteria->input) {
                     case 'USIA':
-                        $nilai = $karyawan->usia;
+                        if ($karyawan->usia <= 20) $nilai = 1;
+                        elseif ($karyawan->usia <= 25) $nilai = 2;
+                        else $nilai = 3;
                         break;
                     case 'PENDIDIKAN':
                         $nilai_pendidikan = ['SMP' => 1, 'SMA' => 2, 'SARJANA' => 3];
@@ -74,7 +76,7 @@ class LaporanPenilaian extends Component
         }
         $this->dispatchBrowserEvent('analisa-updated', $rows->map('array_values'));
         $this->dispatchBrowserEvent('incomplete-alert', $this->incomplete ? 'true' : 'false');
-        if($this->incomplete) return;
+        if ($this->incomplete) return;
 
         if ($rows->isEmpty()) return;
         foreach ($this->semua_kriteria as $kriteria) {
