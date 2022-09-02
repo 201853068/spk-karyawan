@@ -1,12 +1,19 @@
 <div wire:init="init">
     <h4 class="text-center">Analisa</h4>
     <div id="analisa"></div>
-    <h4 class="text-center">Normalisasi</h4>
-    <div id="normalisasi"></div>
-    <h4 class="text-center">Perangkingan</h4>
-    <div id="rangking"></div>
-    <h4 class="text-center">Penentuan Karyawan</h4>
-    <div id="pemilihan"></div>
+    <div id="perhitungan">
+        <h4 class="text-center">Normalisasi</h4>
+        <div id="normalisasi"></div>
+        <h4 class="text-center">Perangkingan</h4>
+        <div id="rangking"></div>
+        <h4 class="text-center">Penentuan Karyawan</h4>
+        <div id="pemilihan"></div>
+    </div>
+    <div id="incomplete-alert" class="alert alert-danger hide">
+        <ul>
+            <li>Untuk melihat hasil laporan, mohon lengkapi semua penilaian terlebih dahulu!</li>
+        </ul>
+    </div>
 </div>
 
 @section('head')
@@ -19,6 +26,7 @@
         window.analisa = window.grid({
             id: 'analisa',
             columns: @js($this->columns),
+            styles: { 0: 'color: red; font-weight: bold' },
         });
         window.addEventListener('analisa-updated', event => {
             window.analisa.updateConfig({data: event.detail}).forceRender();
@@ -61,6 +69,16 @@
         window.addEventListener('pemilihan-updated', event => {
             window.pemilihan.updateConfig({data: event.detail.sort((a, b) => b[3] - a[3])}).forceRender();
         })
+        window.addEventListener('incomplete-alert', event => {
+            if(event.detail == 'true') {
+                $('#perhitungan').addClass('hide');
+                $('#incomplete-alert').addClass('show');
+            } else {
+                $('#perhitungan').removeClass('hide');
+                $('#incomplete-alert').removeClass('show');
+            }
+        })
+
     });
 </script>
 @endpush

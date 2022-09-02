@@ -16,6 +16,7 @@ class LaporanPenilaian extends Component
     public $semua_periode;
     public $periode;
     public $columns;
+    public bool $incomplete = false;
 
     protected $listeners = ['karyawan_terpilih' => 'penetapan_karyawan', 'periode_terpilih' => 'ubah_periode'];
 
@@ -65,12 +66,17 @@ class LaporanPenilaian extends Component
                         break;
                 }
                 $row['k' . $kriteria->id] = $nilai;
+                if ($nilai == 0) {
+                    $this->incomplete = true;
+                }
             }
             $rows->push($row);
         }
         $this->dispatchBrowserEvent('analisa-updated', $rows->map('array_values'));
+        $this->dispatchBrowserEvent('incomplete-alert', $this->incomplete ? 'true' : 'false');
+        if($this->incomplete) return;
 
-        if($rows->isEmpty()) return;
+        if ($rows->isEmpty()) return;
         foreach ($this->semua_kriteria as $kriteria) {
             $semua_nilai = $rows->pluck('k' . $kriteria->id)->toArray();
             $max = max($semua_nilai);
@@ -90,7 +96,7 @@ class LaporanPenilaian extends Component
         }
         $this->dispatchBrowserEvent('normalisasi-updated', $rows->map('array_values'));
 
-        if($rows->isEmpty()) return;
+        if ($rows->isEmpty()) return;
         foreach ($this->semua_kriteria as $kriteria) {
             $rows = $rows->map(function ($item) use ($kriteria) {
                 $item['k' . $kriteria->id] = round($item['k' . $kriteria->id] * $kriteria->bobot, 2);
@@ -103,7 +109,7 @@ class LaporanPenilaian extends Component
         });
         $this->dispatchBrowserEvent('rangking-updated', $rows->map('array_values'));
 
-        if($rows->isEmpty()) return;
+        if ($rows->isEmpty()) return;
         $rows = $rows->map(function ($item) use ($semua_karyawan) {
             $item = collect($item)->only(['id', 'nama', 'jabatan', 'rangking']);
             $item['status'] = $semua_karyawan->find($item['id'])->terpilih ? 'Terpilih' : 'Belum Terpilih';
@@ -115,6 +121,7 @@ class LaporanPenilaian extends Component
     public function ubah_periode($periode)
     {
         $this->periode = $periode;
+        $this->incomplete = false;
         $this->init();
     }
 
